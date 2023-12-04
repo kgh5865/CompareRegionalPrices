@@ -55,10 +55,7 @@
                   <Font name="NanumGothic" size="18.0" />
                </font>
             </Label>
-            <Button layoutX="250.0" layoutY="446.0" mnemonicParsing="false" onAction="#onResultDialog" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #6363ff; -fx-font-weight: bold;" text="결과 확인" textFill="WHITE">
-               <font>
-                  <Font name="NanumGothic" size="18.0" />
-               </font>
+            <Button layoutX="250.0" layoutY="446.0" mnemonicParsing="false" onAction="#onResultDialog" prefHeight="40.0" prefWidth="100.0" style="-fx-background-color: #6363ff; -fx-font-weight: bold; -fx-font-size: 18px; -fx-font-family: NanumGothic;" text="결과 확인" textFill="WHITE">
             </Button>
          </children>
       </AnchorPane>
