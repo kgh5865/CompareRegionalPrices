@@ -15,6 +15,12 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,33 +29,22 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
-
-    String[] itemNames = {
-            "설렁탕", "냉면", "삼계탕", "갈비탕", "불고기(공기밥제외)", "등심구이", "삼겹살(외식)", "된장찌개백반", "김치찌개백반", "튀김닭", "생선초밥",
-            "비빔밥", "김밥", "칼국수", "라면(외식)", "자장면", "짬뽕", "탕수육", "돼지갈비", "돈가스", "쇠갈비", "햄버거", "피자", "다방커피", "다방 국산차",
-            "PC방이용료", "택배수수료", "양복세탁료", "영화관람료", "수영장이용료", "볼링장이용료", "골프연습장이용료", "당구장이용료", "영상매체대여료", "노래방이용료", "사진촬영료",
-            "사진인화료", "이용료", "미용료(드라이)", "미용료(파마)", "미용료(커트)", "목욕료(성인)", "목욕료(아동)", "숙박료(여관)", "학원비(중학생)", "생맥주",
-            "경기장입장료", "찜질방이용료", "의복수선료"
-    };
-
     String[] regions = {
             "공주시", "금산군", "논산시", "당진시", "보령시", "부여군", "서산시",
             "서천군", "아산시", "예산군", "천안시", "청양군", "태안군", "홍성군", "계룡시"
     };
+    String[] itemNames;
 
     @FXML private TextField input_search;
     @FXML private TextField input_price;
     @FXML private ListView<String> listview_search;
     @FXML private AnchorPane anchorpane_main;
-    @FXML private HBox scrollHBox_itemlist;
     @FXML private ScrollPane scrollpane_selectedItem;
     @FXML private GridPane gridpane_regions;
     @FXML private CheckBox checkbox_total;
     @FXML private Stage primaryStage;
 
     DataSingleton dataSingleton = DataSingleton.getInstance();
-
-    private ArrayList<String> selectedItems = new ArrayList<>();
     private ArrayList<String> selectedRegions = new ArrayList<>();
     private ArrayList<CheckBox> regionCheckboxes = new ArrayList<>();
 
@@ -60,6 +55,50 @@ public class MainController implements Initializable {
 
         setGridPane();//지역 체크박스 초기 세팅
 
+        /**** API 품목 가져오기 ****/
+
+        // API 엔드포인트 URL
+        String apiUrl = "https://chungcheong-price-api.vercel.app/products";
+
+        // HTTP 클라이언트 생성
+        HttpClient httpClient = HttpClient.newHttpClient();
+
+        // HTTP 요청 생성
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+                .uri(URI.create(apiUrl))
+                .build();
+
+        try {
+            // HTTP 요청 보내고 응답 받기
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            // 응답이 성공적으로 받아졌을 경우
+            if (response.statusCode() == 200) {
+                // Jackson ObjectMapper 생성
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                // JSON 파싱
+                JsonNode rootNode = objectMapper.readTree(response.body());
+
+                // "data" 객체에서 "productNames" 배열 추출
+                JsonNode productNamesArray = rootNode.path("data").path("productNames");
+                ArrayList<String> itemNamesList = new ArrayList<>();
+
+                // "productNames" 배열의 값을 출력
+                for (JsonNode itemNameNode : productNamesArray) {
+                    String itemName = itemNameNode.asText();
+                    itemNamesList.add(itemName);
+                }
+
+                itemNames = itemNamesList.toArray(new String[0]);//받은 데이터 입력
+            } else {
+                System.out.println("HTTP 요청이 실패했습니다. 상태 코드: " + response.statusCode());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        /**** API 품목 가져오기 ****/
+
         // ListView 초기화
         ObservableList<String> itemList = FXCollections.observableArrayList(itemNames);
         listview_search.setItems(itemList);
@@ -68,7 +107,7 @@ public class MainController implements Initializable {
         input_search.textProperty().addListener((observable, oldValue, newValue) -> {
             ObservableList<String> filteredList = FXCollections.observableArrayList();
             for (String item : itemNames) {
-                if (!selectedItems.contains(item) && item.toLowerCase().contains(newValue.toLowerCase())) {
+                if (item.toLowerCase().contains(newValue.toLowerCase())) {
                     filteredList.add(item);
                 }
             }
@@ -85,11 +124,9 @@ public class MainController implements Initializable {
         listview_search.setOnMouseClicked(event -> {
             String selectedItem = listview_search.getSelectionModel().getSelectedItem();
             if (selectedItem != null) {// 선택한 아이템을 리스트에 추가
-                selectedItems.add(selectedItem);
-                listview_search.getItems().remove(selectedItem);//리스트뷰에서 제거
-                addNewItemButton(selectedItem);//버튼 추가
-                input_search.setText("");
+                input_search.setText(selectedItem);
                 listview_search.setVisible(false);
+                dataSingleton.setItem(selectedItem);//싱글톤 값 넣기
             }
         });
 
@@ -127,33 +164,6 @@ public class MainController implements Initializable {
                 }
             }
         });
-    }
-
-    private void addNewItemButton(String buttonText) {//버튼 추가
-        Button button = new Button(buttonText+" X");
-
-        // 버튼에 스타일 지정
-        button.setStyle("-fx-font-family: 'NanumGothic'; -fx-font-size: 16; -fx-background-color: #ffffff; -fx-border-color: #000000; -fx-border-width: 1; -fx-border-radius: 15;");
-
-        // 버튼에 클릭 이벤트 핸들러 추가
-        button.setOnAction(event -> {
-            scrollHBox_itemlist.getChildren().remove(button);
-            selectedItems.remove(buttonText);
-            resetListItem();
-        });
-
-        // HBox에 버튼 추가
-        scrollHBox_itemlist.getChildren().add(button);
-    }
-
-    private void resetListItem(){//리스트뷰 아이템 초기화
-        ObservableList<String> filteredList = FXCollections.observableArrayList();
-        for (String item : itemNames) {
-            if (!selectedItems.contains(item)) {
-                filteredList.add(item);
-            }
-        }
-        listview_search.setItems(filteredList);
     }
 
     private void setGridPane(){//지역 체크박스 초기 세팅
