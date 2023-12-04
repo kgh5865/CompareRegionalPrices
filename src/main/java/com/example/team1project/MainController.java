@@ -15,10 +15,12 @@ import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -35,14 +37,22 @@ public class MainController implements Initializable {
     };
     String[] itemNames;
 
-    @FXML private TextField input_search;
-    @FXML private TextField input_price;
-    @FXML private ListView<String> listview_search;
-    @FXML private AnchorPane anchorpane_main;
-    @FXML private ScrollPane scrollpane_selectedItem;
-    @FXML private GridPane gridpane_regions;
-    @FXML private CheckBox checkbox_total;
-    @FXML private Stage primaryStage;
+    @FXML
+    private TextField input_search;
+    @FXML
+    private TextField input_price;
+    @FXML
+    private ListView<String> listview_search;
+    @FXML
+    private AnchorPane anchorpane_main;
+    @FXML
+    private ScrollPane scrollpane_selectedItem;
+    @FXML
+    private GridPane gridpane_regions;
+    @FXML
+    private CheckBox checkbox_total;
+    @FXML
+    private Stage primaryStage;
 
     DataSingleton dataSingleton = DataSingleton.getInstance();
     private ArrayList<String> selectedRegions = new ArrayList<>();
@@ -53,7 +63,7 @@ public class MainController implements Initializable {
         input_search.setFocusTraversable(false);
         listview_search.setVisible(false);
 
-        setGridPane();//지역 체크박스 초기 세팅
+        setGridPane();// 지역 체크박스 초기 세팅
 
         /**** API 품목 가져오기 ****/
 
@@ -90,7 +100,7 @@ public class MainController implements Initializable {
                     itemNamesList.add(itemName);
                 }
 
-                itemNames = itemNamesList.toArray(new String[0]);//받은 데이터 입력
+                itemNames = itemNamesList.toArray(new String[0]);// 받은 데이터 입력
             } else {
                 System.out.println("HTTP 요청이 실패했습니다. 상태 코드: " + response.statusCode());
             }
@@ -126,7 +136,7 @@ public class MainController implements Initializable {
             if (selectedItem != null) {// 선택한 아이템을 리스트에 추가
                 input_search.setText(selectedItem);
                 listview_search.setVisible(false);
-                dataSingleton.setItem(selectedItem);//싱글톤 값 넣기
+                dataSingleton.setItem(selectedItem);// 싱글톤 값 넣기
             }
         });
 
@@ -143,7 +153,7 @@ public class MainController implements Initializable {
             if (input_search.isFocused()) {
                 input_search.setFocusTraversable(false);
             }
-            if(listview_search.isVisible()){
+            if (listview_search.isVisible()) {
                 listview_search.setVisible(false);
             }
         });
@@ -154,19 +164,17 @@ public class MainController implements Initializable {
             String newText = input_price.getText() + event.getCharacter();
             if (!character.matches("[0-9]") || newText.length() > 10) {// 숫자가 아니면 입력을 무시, 최대 길이 10
                 event.consume();
-            }
-            else if(input_price.getText().equals("0")){
-                if(character.equals("0")){//0 연속 입력 방지
+            } else if (input_price.getText().equals("0")) {
+                if (character.equals("0")) {// 0 연속 입력 방지
                     event.consume();
-                }
-                else if(character.matches("[1-9]")){//0 제거
+                } else if (character.matches("[1-9]")) {// 0 제거
                     input_price.setText("");
                 }
             }
         });
     }
 
-    private void setGridPane(){//지역 체크박스 초기 세팅
+    private void setGridPane() {// 지역 체크박스 초기 세팅
         int colCount = 4; // 열의 개수
         int rowIndex = 0;
         int colIndex = 1;
@@ -181,14 +189,14 @@ public class MainController implements Initializable {
             checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {// 체크박스 상태가 변경되었을 때의 동작
                 if (newValue && !checkbox_total.isSelected()) {
                     selectedRegions.add(item);
-                } else if(!newValue){
+                } else if (!newValue) {
                     selectedRegions.remove(item);
-                    if(checkbox_total.isSelected()){
+                    if (checkbox_total.isSelected()) {
                         checkbox_total.setSelected(false);
                     }
                 }
 
-                //System.out.println("Selected Regions: " + selectedRegions);
+                // System.out.println("Selected Regions: " + selectedRegions);
             });
 
             gridpane_regions.add(checkBox, colIndex, rowIndex);
