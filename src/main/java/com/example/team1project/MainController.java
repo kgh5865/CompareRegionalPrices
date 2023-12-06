@@ -55,7 +55,6 @@ public class MainController implements Initializable {
     private Stage primaryStage;
 
     DataSingleton dataSingleton = DataSingleton.getInstance();
-    private ArrayList<String> selectedRegions = new ArrayList<>();
     private ArrayList<CheckBox> regionCheckboxes = new ArrayList<>();
 
     @Override
@@ -188,9 +187,9 @@ public class MainController implements Initializable {
 
             checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {// 체크박스 상태가 변경되었을 때의 동작
                 if (newValue && !checkbox_total.isSelected()) {
-                    selectedRegions.add(item);
+                    dataSingleton.getSelectedRegions().add(item);
                 } else if (!newValue) {
-                    selectedRegions.remove(item);
+                    dataSingleton.getSelectedRegions().remove(item);
                     if (checkbox_total.isSelected()) {
                         checkbox_total.setSelected(false);
                     }
@@ -229,9 +228,9 @@ public class MainController implements Initializable {
         boolean isSelected = checkbox_total.isSelected();
 
         // 모든 지역을 선택 상태에 따라 추가 또는 제거
-        selectedRegions.clear();
+        dataSingleton.getSelectedRegions().clear();
         if (isSelected) {
-            selectedRegions.addAll(Arrays.asList(regions));
+            dataSingleton.getSelectedRegions().addAll(Arrays.asList(regions));
         }
 
         for (CheckBox checkBox : regionCheckboxes) {
