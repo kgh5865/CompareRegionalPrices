@@ -9,6 +9,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -27,24 +28,21 @@ public class ResultController implements Initializable {
 
     DataSingleton dataSingleton = DataSingleton.getInstance();
     @FXML private AnchorPane anchorpane;
+    @FXML private Label resultText1, resultText2, resultText3;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // 데이터 싱글톤에서 item을 얻어오고
         String targetItem = dataSingleton.getItem();
+        String targetRegion = dataSingleton.getRegion();
+        String targetPrice = dataSingleton.getPrice();
+
 
         // getPrices 메소드를 통해 지역별 가격을 map 객체에 불러오고
         Map<String, Integer> result = getPrices(targetItem);
 
-        // map에 잘 들어왔는지 테스트
-        /*
-        if (result == null) {
-            System.out.println("map is null");
-        } else {
-            for (String r : result.keySet()) {
-                System.out.println(r + " : " + result.get(r));
-            }
-        }*/
+        // result 정보를 이용하여 라벨 텍스트 수정하기
+        setSuccessLabels(result);
 
         /****************그래프****************/
         // X축 및 Y축 생성
@@ -61,7 +59,7 @@ public class ResultController implements Initializable {
         series.setName("강원도 지역별 물가 그래프");
 
         // 데이터 추가 (예제에서는 간단하게 1부터 10까지의 데이터 추가)
-        ArrayList<String> regions = dataSingleton.getSelectedRegions();
+        // String region = dataSingleton.getRegion();
         /*
         for (String region : regions) {
             series.getData().add(new XYChart.Data<>(region, result.get(region)));
@@ -92,7 +90,7 @@ public class ResultController implements Initializable {
 
         // 라인 차트 생성 및 데이터 추가
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
-        lineChart.setTitle("Line Chart Example");
+        lineChart.setTitle(targetItem + " | 강원도 물가 그래프");
 
         // 차트에 데이터 추가
         lineChart.getData().add(series);
@@ -102,10 +100,46 @@ public class ResultController implements Initializable {
 
         // AnchorPane 내에서 차트 위치 설정
         anchorpane.setTopAnchor(lineChart, 10.0);
-        anchorpane.setRightAnchor(lineChart, 50.0);
-        anchorpane.setBottomAnchor(lineChart, 50.0);
-        anchorpane.setLeftAnchor(lineChart, 50.0);
+        anchorpane.setRightAnchor(lineChart, 60.0);
+        anchorpane.setBottomAnchor(lineChart, 150.0);
+        anchorpane.setLeftAnchor(lineChart, 60.0);
         /****************그래프****************/
+
+    }
+
+    // Label 텍스트를 결과에 맞게 바꿔주는 메소드입니다.
+    private void setSuccessLabels(Map<String, Integer> result) {
+        String item = dataSingleton.getItem();
+        String region = dataSingleton.getRegion();
+        int price = Integer.parseInt(dataSingleton.getPrice());
+
+        // text1 설정
+        int regionPrice = result.get(region);
+        if (price > regionPrice) {
+            resultText1.setText("입력 가격(" + price + "원)이 선택된 지역(" + region + ")의 물가보다 높습니다.");
+        } else if (price < regionPrice) {
+            resultText1.setText("입력 가격(" + price + "원)이 선택된 지역(" + region + ")의 물가보다 낮습니다.");
+        } else {
+            resultText1.setText("입력 가격(" + price + "원)이 선택된 지역(" + region + ")의 물가와 같습니다.");
+        }
+
+
+        // text2 설정
+        resultText2.setText(item + "의 " + region + " 물가 : " + regionPrice + "원");
+        // text3 설정
+        resultText3.setText("강원도 평균 물가 : " + result.get("강원도") + "원");
+
+        // Label 들의 위치들을 조정합니다.
+        anchorpane.setBottomAnchor(resultText1, 110.0);
+        anchorpane.setBottomAnchor(resultText2, 80.0);
+        anchorpane.setBottomAnchor(resultText3, 50.0);
+
+        anchorpane.setRightAnchor(resultText1, 0.0);
+        anchorpane.setLeftAnchor(resultText1, 0.0);
+        anchorpane.setRightAnchor(resultText2, 0.0);
+        anchorpane.setLeftAnchor(resultText2, 0.0);
+        anchorpane.setRightAnchor(resultText3, 0.0);
+        anchorpane.setLeftAnchor(resultText3, 0.0);
 
     }
 
