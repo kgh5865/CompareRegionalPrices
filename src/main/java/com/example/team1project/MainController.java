@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
     String[] regions = {
-            "춘천시", "원주시", "강릉시", "동해시", "태백시", "속초시", "삼척시", "홍천군", "횡성군", "영월군", "평창군", "정선군", "철원군", "화천군", "양구군", "인제군", "고성군", "양양군"
+            "강원도", "춘천시", "원주시", "강릉시", "동해시", "태백시", "속초시", "삼척시", "홍천군", "횡성군", "영월군", "평창군", "정선군", "철원군", "화천군", "양구군", "인제군", "고성군", "양양군"
     };
     String[] itemNames;
 
@@ -50,12 +50,10 @@ public class MainController implements Initializable {
     @FXML
     private GridPane gridpane_regions;
     @FXML
-    private CheckBox checkbox_total;
-    @FXML
     private Stage primaryStage;
 
     DataSingleton dataSingleton = DataSingleton.getInstance();
-    private ArrayList<String> selectedRegions = new ArrayList<>();
+    private String selectedRegion = "";
     private ArrayList<CheckBox> regionCheckboxes = new ArrayList<>();
 
     @Override
@@ -177,7 +175,7 @@ public class MainController implements Initializable {
     private void setGridPane() {// 지역 체크박스 초기 세팅
         int colCount = 4; // 열의 개수
         int rowIndex = 0;
-        int colIndex = 1;
+        int colIndex = 0;
 
         for (String item : regions) {
             CheckBox checkBox = new CheckBox(item);
@@ -186,17 +184,17 @@ public class MainController implements Initializable {
             // CheckBox를 리스트에 추가
             regionCheckboxes.add(checkBox);
 
-            checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {// 체크박스 상태가 변경되었을 때의 동작
-                if (newValue && !checkbox_total.isSelected()) {
-                    selectedRegions.add(item);
-                } else if (!newValue) {
-                    selectedRegions.remove(item);
-                    if (checkbox_total.isSelected()) {
-                        checkbox_total.setSelected(false);
+            checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    selectedRegion = item;
+
+                    // Uncheck other CheckBoxes
+                    for (CheckBox cb : regionCheckboxes) {
+                        if (cb != checkBox) {
+                            cb.setSelected(false);
+                        }
                     }
                 }
-
-                // System.out.println("Selected Regions: " + selectedRegions);
             });
 
             gridpane_regions.add(checkBox, colIndex, rowIndex);
@@ -223,22 +221,6 @@ public class MainController implements Initializable {
         }
     }
 
-    @FXML
-    private void handleTotalCheckboxAction() {
-        // 전체 선택/해제 체크박스의 상태에 따라 모든 체크박스 선택/해제
-        boolean isSelected = checkbox_total.isSelected();
-
-        // 모든 지역을 선택 상태에 따라 추가 또는 제거
-        selectedRegions.clear();
-        if (isSelected) {
-            selectedRegions.addAll(Arrays.asList(regions));
-        }
-
-        for (CheckBox checkBox : regionCheckboxes) {
-            checkBox.setSelected(isSelected);
-        }
-    }
-
 
     @FXML
     private void onResultDialog() {
@@ -246,16 +228,12 @@ public class MainController implements Initializable {
             System.out.println("물품을 선택하세요");
             return;
         }
-        if (selectedRegions.isEmpty()) {
-            System.out.println("지역을 하나 선택하세요.");
-            return;
-        }
         if (input_price.getText() == null || Objects.equals(input_price.getText(), "")) {
             System.out.println("가격을 입력하세요.");
             return;
         }
 
-        dataSingleton.setRegion(selectedRegions.get(0));
+        dataSingleton.setRegion(selectedRegion);
         dataSingleton.setPrice(input_price.getText());
 
         Stage dialog = new Stage(StageStyle.UTILITY);

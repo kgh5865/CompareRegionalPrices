@@ -11,6 +11,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.UnsupportedEncodingException;
@@ -58,14 +59,6 @@ public class ResultController implements Initializable {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("강원도 지역별 물가 그래프");
 
-        // 데이터 추가 (예제에서는 간단하게 1부터 10까지의 데이터 추가)
-        // String region = dataSingleton.getRegion();
-        /*
-        for (String region : regions) {
-            series.getData().add(new XYChart.Data<>(region, result.get(region)));
-        }
-        */
-
         int max=0, min=0;//y축 최대, 최소
 
         if (result == null) {
@@ -91,6 +84,7 @@ public class ResultController implements Initializable {
         // 라인 차트 생성 및 데이터 추가
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle(targetItem + " | 강원도 물가 그래프");
+
 
         // 차트에 데이터 추가
         lineChart.getData().add(series);
