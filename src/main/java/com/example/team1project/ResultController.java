@@ -69,12 +69,21 @@ public class ResultController implements Initializable {
         */
 
         int max = 0, min = 0;// y축 최대, 최소
+        int price;
 
         if (result == null) {
             System.out.println("map is null");
         } else {
+            price = result.get("강원도");
+            series.getData().add(new XYChart.Data<>("강원도", price));
+
+            min = price;
+            if (max < price) max = price;
+
             for (String r : result.keySet()) {
-                int price = result.get(r);
+                if (r.equals("강원도")) continue;
+
+                price = result.get(r);
                 series.getData().add(new XYChart.Data<>(r, price));
 
                 if (min == 0 || min > price) min = price;// 처음 받아올 때만 값을 받음
