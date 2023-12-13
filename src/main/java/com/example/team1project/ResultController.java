@@ -94,6 +94,9 @@ public class ResultController implements Initializable {
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle(targetItem + " | 강원도 물가 그래프");
 
+        // lineChart Style
+        lineChart.setStyle("-fx-font-size: 18px; -fx-font-weight: bold");
+
         // 차트에 데이터 추가
         lineChart.getData().add(series);
 
