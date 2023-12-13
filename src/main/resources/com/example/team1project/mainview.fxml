@@ -10,7 +10,7 @@
    <children>
       <AnchorPane fx:id="anchorpane_main" style="-fx-background-color: #ffffff;">
          <children>
-            <Label layoutX="251.0" layoutY="14.0" text="물가 검색">
+            <Label layoutX="250.0" layoutY="14.0" style="-fx-font-weight: bold;" text="물가 검색">
                <font>
                   <Font name="NanumGothic" size="24.0" />
                </font>

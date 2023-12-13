@@ -11,6 +11,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.io.UnsupportedEncodingException;
@@ -27,8 +28,10 @@ import java.util.*;
 public class ResultController implements Initializable {
 
     DataSingleton dataSingleton = DataSingleton.getInstance();
-    @FXML private AnchorPane anchorpane;
-    @FXML private Label resultText1, resultText2, resultText3;
+    @FXML
+    private AnchorPane anchorpane;
+    @FXML
+    private Label resultText1, resultText2, resultText3;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -66,31 +69,46 @@ public class ResultController implements Initializable {
         }
         */
 
-        int max=0, min=0;//y축 최대, 최소
+        int max = 0, min = 0;// y축 최대, 최소
+        int price;
 
         if (result == null) {
             System.out.println("map is null");
         } else {
+            price = result.get("강원도");
+            series.getData().add(new XYChart.Data<>("강원도", price));
+
+            min = price;
+            if (max < price) max = price;
+
             for (String r : result.keySet()) {
-                int price=result.get(r);
+                if (r.equals("강원도")) continue;
+
+                price = result.get(r);
                 series.getData().add(new XYChart.Data<>(r, price));
 
-                if(min == 0 || min > price) min=price;//처음 받아올 때만 값을 받음
-                if(max<price) max=price;
+                if (min == 0 || min > price) min = price;// 처음 받아올 때만 값을 받음
+                if (max < price) max = price;
             }
         }
 
-        max+=500;
-        min-=500;
-        if(min<500) min=0;//아무리 최소라도 0보다 낮지 않음
+        max += 500;
+        min -= 500;
+        if (min < 500) min = 0;// 아무리 최소라도 0보다 낮지 않음
 
         yAxis.setLowerBound(min);
         yAxis.setUpperBound(max);
-        yAxis.setTickUnit((max-min)/12);
+        yAxis.setTickUnit((max - min) / 12);
 
         // 라인 차트 생성 및 데이터 추가
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
         lineChart.setTitle(targetItem + " | 강원도 물가 그래프");
+
+        // lineChart Style
+        lineChart.lookup(".chart-title").setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        lineChart.getXAxis().setTickLabelFont(javafx.scene.text.Font.font(null, javafx.scene.text.FontWeight.BOLD, 14));
+        lineChart.getYAxis().setTickLabelFont(javafx.scene.text.Font.font(null, javafx.scene.text.FontWeight.BOLD, 13));
+
 
         // 차트에 데이터 추가
         lineChart.getData().add(series);
@@ -114,25 +132,36 @@ public class ResultController implements Initializable {
         int price = Integer.parseInt(dataSingleton.getPrice());
 
         // text1 설정
+        StringBuilder text1StringBuilder = new StringBuilder();
+        text1StringBuilder.append("입력 가격(").append(price).append("원)이 ").append(region).append("의 가격");
+
         int regionPrice = result.get(region);
         if (price > regionPrice) {
-            resultText1.setText("입력 가격(" + price + "원)이 선택된 지역(" + region + ")의 물가보다 높습니다.");
+            text1StringBuilder.append("보다 높습니다.").append(" [+").append(price - regionPrice).append("원]");
         } else if (price < regionPrice) {
-            resultText1.setText("입력 가격(" + price + "원)이 선택된 지역(" + region + ")의 물가보다 낮습니다.");
+            text1StringBuilder.append("보다 낮습니다.").append(" [").append(price - regionPrice).append("원]");
         } else {
-            resultText1.setText("입력 가격(" + price + "원)이 선택된 지역(" + region + ")의 물가와 같습니다.");
+            text1StringBuilder.append("와 같습니다.");
         }
 
 
+        resultText1.setText(text1StringBuilder.toString());
+
+
         // text2 설정
-        resultText2.setText(item + "의 " + region + " 물가 : " + regionPrice + "원");
+        resultText2.setText(region + "의 " + item + " 가격 : " + regionPrice + "원");
         // text3 설정
-        resultText3.setText("강원도 평균 물가 : " + result.get("강원도") + "원");
+        resultText3.setText("강원도의 " + item + " 가격 : " + result.get("강원도") + "원");
+
+        // result 들의 style
+        resultText1.setStyle("-fx-font-size: 20px; -fx-font-weight: 600");
+        resultText2.setStyle("-fx-font-size: 20px; -fx-font-weight: 600");
+        resultText3.setStyle("-fx-font-size: 20px; -fx-font-weight: 600");
 
         // Label 들의 위치들을 조정합니다.
         anchorpane.setBottomAnchor(resultText1, 110.0);
-        anchorpane.setBottomAnchor(resultText2, 80.0);
-        anchorpane.setBottomAnchor(resultText3, 50.0);
+        anchorpane.setBottomAnchor(resultText2, 75.0);
+        anchorpane.setBottomAnchor(resultText3, 40.0);
 
         anchorpane.setRightAnchor(resultText1, 0.0);
         anchorpane.setLeftAnchor(resultText1, 0.0);
