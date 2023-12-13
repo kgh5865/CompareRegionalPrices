@@ -11,6 +11,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.io.UnsupportedEncodingException;
@@ -104,7 +105,10 @@ public class ResultController implements Initializable {
         lineChart.setTitle(targetItem + " | 강원도 물가 그래프");
 
         // lineChart Style
-        lineChart.setStyle("-fx-font-size: 18px; -fx-font-weight: bold");
+        lineChart.lookup(".chart-title").setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
+        lineChart.getXAxis().setTickLabelFont(javafx.scene.text.Font.font(null, javafx.scene.text.FontWeight.BOLD, 14));
+        lineChart.getYAxis().setTickLabelFont(javafx.scene.text.Font.font(null, javafx.scene.text.FontWeight.BOLD, 13));
+
 
         // 차트에 데이터 추가
         lineChart.getData().add(series);
