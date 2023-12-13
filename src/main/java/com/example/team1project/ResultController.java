@@ -140,10 +140,15 @@ public class ResultController implements Initializable {
         // text3 설정
         resultText3.setText("강원도의 " + item + " 가격 : " + result.get("강원도") + "원");
 
+        // result 들의 style
+        resultText1.setStyle("-fx-font-size: 20px; -fx-font-weight: 600");
+        resultText2.setStyle("-fx-font-size: 20px; -fx-font-weight: 600");
+        resultText3.setStyle("-fx-font-size: 20px; -fx-font-weight: 600");
+
         // Label 들의 위치들을 조정합니다.
         anchorpane.setBottomAnchor(resultText1, 110.0);
-        anchorpane.setBottomAnchor(resultText2, 80.0);
-        anchorpane.setBottomAnchor(resultText3, 50.0);
+        anchorpane.setBottomAnchor(resultText2, 75.0);
+        anchorpane.setBottomAnchor(resultText3, 40.0);
 
         anchorpane.setRightAnchor(resultText1, 0.0);
         anchorpane.setLeftAnchor(resultText1, 0.0);
