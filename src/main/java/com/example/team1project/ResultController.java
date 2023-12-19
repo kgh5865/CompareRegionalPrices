@@ -181,44 +181,43 @@ public class ResultController implements Initializable {
             return pricesMap;
         }
 
-
         try {
-
+            // 아이템을 UTF-8로 인코딩
             String encodedItem = URLEncoder.encode(item, StandardCharsets.UTF_8);
 
-            // API endpoint URL with encoded item parameter
+            // 인코딩된 아이템을 포함한 API 엔드포인트 URL
             String apiUrl = "https://chungcheong-price-api.vercel.app/prices?product=" + encodedItem;
 
-            // HTTP client creation
+            // HTTP 클라이언트 생성
             HttpClient httpClient = HttpClient.newHttpClient();
 
-            // HTTP request creation
+            // HTTP 요청 생성
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(apiUrl))
                     .build();
 
-            // Send HTTP request and receive response
+            // HTTP 요청 보내고 응답 받기
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
-            // If the response is successful
+            // 응답이 성공적으로 받아졌을 경우
             if (response.statusCode() == 200) {
-                // Jackson ObjectMapper creation
+                // Jackson ObjectMapper 생성
                 ObjectMapper objectMapper = new ObjectMapper();
 
-                // JSON parsing
+                // JSON 파싱
                 JsonNode rootNode = objectMapper.readTree(response.body());
 
-                // Extract prices from "data" object
+                // "data" 객체에서 "prices" 배열 추출
                 JsonNode pricesNode = rootNode.path("data").path("prices");
 
-                // Iterate over the prices and add them to the map
+                // 각 지역의 가격을 맵에 추가
                 pricesNode.fields().forEachRemaining(entry -> {
                     String location = entry.getKey();
                     int price = entry.getValue().asInt();
                     pricesMap.put(location, price);
                 });
             } else {
-                System.out.println("HTTP request failed. Status code: " + response.statusCode());
+                System.out.println("HTTP 요청이 실패했습니다. 상태 코드: " + response.statusCode());
             }
         } catch (Exception e) {
             e.printStackTrace();

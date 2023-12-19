@@ -3,9 +3,9 @@ package com.example.team1project;
 public class DataSingleton {
     private static final DataSingleton instance = new DataSingleton();
 
-    private String item;
-    private String price;
-    private String region;
+    private String item;//선택한 품목
+    private String price;//입력한 가격
+    private String region;//선택한 지역
 
     private DataSingleton() {
     }

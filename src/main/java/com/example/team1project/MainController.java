@@ -1,7 +1,4 @@
 package com.example.team1project;
-
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -112,20 +109,20 @@ public class MainController implements Initializable {
         listview_search.setItems(itemList);
 
         // 검색 기능 구현
-        input_search.textProperty().addListener((observable, oldValue, newValue) -> {
-            ObservableList<String> filteredList = FXCollections.observableArrayList();
+        input_search.textProperty().addListener((observable, oldValue, newValue) -> {//입력란의 텍스트 변화 감지
+            ObservableList<String> filteredList = FXCollections.observableArrayList();//검색어에 맞는 아이템을 담을 리스트
             for (String item : itemNames) {
-                if (item.toLowerCase().contains(newValue.toLowerCase())) {
+                if (item.toLowerCase().contains(newValue.toLowerCase())) {//검색어와 일치하는 아이템 찾기
                     filteredList.add(item);
                 }
             }
-            listview_search.setItems(filteredList);
+            listview_search.setItems(filteredList);//필터링 된 목록으로 리스트뷰 업데이트
 
             // 동적으로 ListView의 높이 조절
             int numVisibleItems = Math.min(filteredList.size(), 5); // 최대 표시 아이템 수를 설정
             double itemHeight = 30.0; // 각 항목의 높이를 설정 (조절이 필요하면 적절한 값으로 변경)
             double newHeight = numVisibleItems * itemHeight;
-            listview_search.setPrefHeight(newHeight);
+            listview_search.setPrefHeight(newHeight);//리스트뷰 높이 조정
         });
 
         // 리스트뷰 아이템 클릭 이벤트 처리 (선택된 아이템을 텍스트필드에 설정하고 리스트뷰 숨김)
@@ -177,27 +174,22 @@ public class MainController implements Initializable {
         int rowIndex = 0;
         int colIndex = 0;
 
-        for (String item : regions) {
-            CheckBox checkBox = new CheckBox(item);
+        for (String item : regions) {//각 지역
+            CheckBox checkBox = new CheckBox(item);//체크박스 생성
             checkBox.setStyle("-fx-font-family: 'NanumGothic'; -fx-font-size: 16; -fx-background-color: #ffffff;");
+            regionCheckboxes.add(checkBox);// CheckBox를 리스트에 추가
 
-            // CheckBox를 리스트에 추가
-            regionCheckboxes.add(checkBox);
-
-            checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                if (newValue) {
-                    selectedRegion = item;
-
-                    // Uncheck other CheckBoxes
-                    for (CheckBox cb : regionCheckboxes) {
+            checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {//체크박스를 눌렀을 때
+                if (newValue) {//해당 체크박스가 체크되었을 때
+                    selectedRegion = item;//지역 선택 저장
+                    for (CheckBox cb : regionCheckboxes) {//다른 체크박스 false
                         if (cb != checkBox) {
                             cb.setSelected(false);
                         }
                     }
                 }
             });
-
-            gridpane_regions.add(checkBox, colIndex, rowIndex);
+            gridpane_regions.add(checkBox, colIndex, rowIndex);//그리드팬에 현재 체크박스 추가
 
             // 열과 행 인덱스 업데이트
             colIndex++;
@@ -207,14 +199,12 @@ public class MainController implements Initializable {
             }
         }
 
-        // ColumnConstraints 및 RowConstraints 설정
-        for (int i = 0; i < colCount; i++) {
+        for (int i = 0; i < colCount; i++) {//계산한 열의 개수만큼 그리드팬에 열 추가
             ColumnConstraints colConst = new ColumnConstraints();
             colConst.setPercentWidth(100.0 / colCount);
             gridpane_regions.getColumnConstraints().add(colConst);
         }
-
-        for (int i = 0; i < regions.length / colCount; i++) {
+        for (int i = 0; i < regions.length / colCount; i++) {//계산한 행만큼 그리드팬에 행 추가
             RowConstraints rowConst = new RowConstraints();
             rowConst.setPercentHeight(100.0 / (regions.length / colCount));
             gridpane_regions.getRowConstraints().add(rowConst);
